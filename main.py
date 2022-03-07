@@ -55,7 +55,9 @@ def main():
 
     print("\nPlayers winnings stand at", player_chips.total-principal)
 
-def get_action(dealer_card,hand_value):
+
+
+def get_action(dealer_card,hand):
     from basic_strategy_tab import basic_strategy_hard
     from basic_strategy_tab import basic_strategy_soft
 
