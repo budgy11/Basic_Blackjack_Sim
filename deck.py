@@ -6,9 +6,12 @@ class Deck:
             for i in range(2,12): #add values for number cards and Aces
                 for j in range(0,4):
                    self.deck.append(i) 
-            for i in range(0,3): #add values for face cards K Q J
-                for j in range(0,4):
-                    self.deck.append(10)
+            for j in range(0,4):
+                self.deck.append('k')
+            for k in range(0,4):
+                self.deck.append('q')
+            for l in range(0,4):
+                self.deck.append('j')
 
     def __str__(self):
         deck_comp = ''
