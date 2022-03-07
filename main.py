@@ -9,11 +9,13 @@ def main():
     
     total_cards = play_deck.get_length()
     
-    principal=1000
+    principal=100000
     player_chips = chips.Chips(principal)
 
-    for i in range(0,100): 
-
+    for i in range(0,10): 
+        #print(i)
+        reset_bet(player_chips) # resets bet to 0
+        #Reshuffles deck after 70% penetrations
         if play_deck.get_length() < (0.3 * total_cards):
             play_deck = deck.Deck(6)
             play_deck.shuffle()
@@ -28,18 +30,18 @@ def main():
         
         dealer_card = dealer_hand.cards[1]
 
-        betting(player_chips)
-        hit_or_stand(play_deck,player_hand,dealer_card)
+        betting(player_chips,10)
+        hit_or_stand(play_deck,player_hand,dealer_card,player_chips,10)
 
-        if player_hand.value > 21:
-            player_busts(player_hand, dealer_hand, player_chips)
-
+        #this check should be done after but it creates a bug where for loop doesn't increment if after bust check
         if player_hand.value <= 21:
-
             while dealer_hand.value < 17: #currently stands on all 17
                 hit(play_deck,dealer_hand)
 
-        if dealer_hand.value > 21:
+        if player_hand.value > 21:
+            player_busts(player_hand, dealer_hand, player_chips) 
+
+        elif dealer_hand.value > 21: #
             dealer_busts(player_hand,dealer_hand,player_chips)
 
         elif dealer_hand.value > player_hand.value:
@@ -57,9 +59,13 @@ def get_action(dealer_card,hand_value):
     from basic_strategy_tab import basic_strategy_hard
     return basic_strategy_hard[dealer_card][hand_value] #hand value passed into function
 
-def betting(chips):
-    if chips.total >= 10:
-        chips.bet = 10 #implement spread later
+def reset_bet(chips):
+    chips.bet = 0
+
+def betting(chips, amt):
+    if chips.total >= amt:
+        chips.bet += amt #implement spread later
+        #print(chips.bet)
     else:
         print("Sorry you're broke")
         exit()
@@ -68,27 +74,25 @@ def hit(deck,hand):
     hand.add_card(deck.deal())
     hand.adjust_for_ace()
 
-def hit_or_stand(deck,hand,dealer_card):
+def hit_or_stand(deck,hand,dealer_card,player_chips,amt):
+    action = "X"
+    while action != "S":
+        if hand.value > 21:
+            action = "S" #to prevent infinite looping
+        elif get_action(dealer_card,hand.value) == "H":
+            hit(deck,hand)
+        elif get_action(dealer_card,hand.value) == "D":
+            betting(player_chips,amt)
+            hit(deck,hand)
+            action = "S"
 
-    if hand.value > 21:
-        print("busted")
-
-    else:
-        while get_action(dealer_card,hand.value) == "S":
-            if get_action(dealer_card,hand.value) == "H":
-                hit(deck,hand)
-
-            elif get_action(dealer_card,hand.value) == "D":
-                #DONT FORGET TO ADD FUNCTION TO DOUBLE BET
-                hit(deck,hand)
-
-            elif get_action(dealer_card,hand.value) == "S": #might be unnecessary
-                break
-            else:
-                print("error on choice")
+        elif get_action(dealer_card,hand.value) == "S": #might be unnecessary
+            action = "S"
+        else:
+            print("error on choice")
 
 
-def player_busts(player,dealer,chips):
+def player_busts(player,dealer_hand,chips):
     print("player busts")
     chips.lose_bet()
 
