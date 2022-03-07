@@ -8,9 +8,13 @@ class Hand:
 
     def add_card(self,card):
         self.cards.append(card)
-        self.value += card
+        #print(card)
         if card == 11:
             self.aces += 1
+        if card == 'k' or card == 'q' or card == 'j':
+            self.value += 10
+        else:
+            self.value += card
 
     def adjust_for_ace(self):
         while self.value > 21 and self.aces:
