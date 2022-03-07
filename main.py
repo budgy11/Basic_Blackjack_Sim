@@ -57,7 +57,12 @@ def main():
 
 def get_action(dealer_card,hand_value):
     from basic_strategy_tab import basic_strategy_hard
-    return basic_strategy_hard[dealer_card][hand_value] #hand value passed into function
+    from basic_strategy_tab import basic_strategy_soft
+
+    if hand.aces == 0:
+        return basic_strategy_hard[dealer_card][hand.value] #hand value passed into function
+    else:
+        return basic_strategy_soft[dealer_card][hand.value] #hand value passed into function
 
 def reset_bet(chips):
     chips.bet = 0
@@ -78,18 +83,21 @@ def hit_or_stand(deck,hand,dealer_card,player_chips,amt):
     action = "X"
     while action != "S":
         if hand.value > 21:
-            action = "S" #to prevent infinite looping
-        elif get_action(dealer_card,hand.value) == "H":
+            if hand.aces > 0:
+                hand.adjust_for_ace()
+            else:
+                action = "S" #to prevent infinite looping
+        elif get_action(dealer_card,hand) == "H":
             hit(deck,hand)
-        elif get_action(dealer_card,hand.value) == "D":
+        elif get_action(dealer_card,hand) == "D":
             betting(player_chips,amt)
             hit(deck,hand)
             action = "S"
-
-        elif get_action(dealer_card,hand.value) == "S": #might be unnecessary
+        elif get_action(dealer_card,hand) == "S": #might be unnecessary
             action = "S"
         else:
             print("error on choice")
+            action = "S"
 
 
 def player_busts(player,dealer_hand,chips):
